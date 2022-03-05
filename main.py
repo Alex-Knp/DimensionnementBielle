@@ -11,10 +11,39 @@ Q = @valeur chaleur emise par fuel par kg de melange admis@ #[J/kg_inlet gas]
 
 
 def myfunc(rpm, s, theta, thetaC, deltaThetaC):
+    """
 
+    :param rpm: vitesse moteur
+    :param s: pression turbo
+    :param theta: angles moteur
+    :param thetaC: angle d'allumage
+    :param deltaThetaC: durée de combustion
+    :return:
+    """
+    V_output = []
+    Q_output = []
+    F_pied_output = []
+    F_tete_output = []
+    p_output = []
+
+    for t in range(len(theta)):
+        V_output[t] = volume(t)
+        Q_output[t] = q_compute(t,thetaC,deltaThetaC)
+        p_output[t] = p_theta(rpm,s,theta,thetaC,deltaThetaC)
+        F_pied_output[t] = f_pied(t,p_output[t])
+        F_tete_output[t] = f_tete(t,p_output[t])
+
+    max_pied = max(max(F_pied_output),abs(min(F_pied_output)))
+    max_tete = max(max(F_tete_output),abs(min(F_tete_output)))
+    peak_force = max(max_tete,max_pied)
+    t = t_compute(peak_force)
 
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
+def p_theta(rpm, s, theta, thetaC, deltaThetaC):
+    """partie la plus dure du devoir -> il faut intégrer numériquement"""
+
+    return p
 
 def t_compute(peak_force):
     """
