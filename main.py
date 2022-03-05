@@ -70,3 +70,8 @@ def volume(theta):
     beta = 2*L/C
 
     return (vc/2)*(1-cos(theta)+beta-sqrt(beta**2-sin(theta)**2))+vc/(tau-1)
+
+def q_compute(theta , thetaC, deltaThetaC):
+    """/!\ vérifier que Q est bien la variable qu'il faut"""
+
+    return Q*0.5*(1-cos(pi*((theta-thetaC)/deltaThetaC)))
