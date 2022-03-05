@@ -46,11 +46,8 @@ def f_pied(theta, p_theta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur le pied de la bielle
     """
-    omega = 6*rpm
+    return (pi*(D**2)/4)*p_theta - mpiston*(C/2)*((6*rpm)**2)*cos(theta)
 
-    force = (pi*(D**2)/4)*p_theta - mpiston*(D/2)*(omega**2)*cos(theta)
-
-    return force
 
 
 def f_tete(theta, p_theta, rpm):
@@ -60,21 +57,16 @@ def f_tete(theta, p_theta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur la tête de la bielle
     """
+    return -(pi*(D**2)/4)*p_theta + (mpiston+mbielle)*(C/2)*((6*rpm)**2)*cos(theta)
 
-    omega = 6*rpm
-
-    force = -(pi*(D**2)/4)*p_theta + (mpiston+mbielle)*(D/2)*(omega**2)*cos(theta)
-
-    return force
 
 
 def volume(theta):
     """
-
     :param theta: angle moteur
     :return: volume du cylindre
     """
+    vc = (pi*(D**2)/4)*C
+    beta = 2*L/C
 
-    return (volume)
-
-
+    return (vc/2)*(1-cos(theta)+beta-sqrt(beta**2-sin(theta)**2))+vc/(tau-1)
