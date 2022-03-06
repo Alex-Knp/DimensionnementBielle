@@ -14,10 +14,15 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     """
 
     :param rpm: vitesse moteur
+    :type rpm: int
     :param s: pression turbo
+    :type s: float
     :param theta: angles moteur
+    :type theta: list[int]
     :param thetaC: angle d'allumage
+    :type thetaC: int
     :param deltaThetaC: durée de combustion
+    :type deltaThetaC: int
     :return:
     """
     V_output = []
@@ -30,8 +35,8 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
         V_output[t] = volume(t)
         Q_output[t] = q_compute(t,thetaC,deltaThetaC)
         p_output[t] = p_theta(rpm,s,theta,thetaC,deltaThetaC)
-        F_pied_output[t] = f_pied(t,p_output[t])
-        F_tete_output[t] = f_tete(t,p_output[t])
+        F_pied_output[t] = f_pied(t,p_output[t],rpm)
+        F_tete_output[t] = f_tete(t,p_output[t],rpm)
 
     max_pied = max(max(F_pied_output),abs(min(F_pied_output)))
     max_tete = max(max(F_tete_output),abs(min(F_tete_output)))
@@ -41,12 +46,23 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
 def p_theta(rpm, s, theta, thetaC, deltaThetaC):
-    """partie la plus dure du devoir -> il faut intégrer numériquement"""
+    #partie la plus dure du devoir -> il faut intégrer numériquement
+    """
+    calcule la pression dans le cylindre à l'angle moteur theta
+    :param rpm: vitesse moteur
+    :param s: taux de suralimentation
+    :param theta: angle moteur
+    :param thetaC: angle moteur d'allumage
+    :param deltaThetaC: durée de combustion
+    :return: pression dans le clindre
+    """
 
     return p
 
 def t_compute(peak_force):
     """
+    calcule la dimension de la bielle en fonction de la force maximale à
+    laquelle elle va être soumise
     :param peak_force: force maximale exercée sur la bielle
     :type peak_force : int
     :rtype: int
@@ -62,36 +78,39 @@ def t_compute(peak_force):
     roots = np.roots([a,0,b,0,c])
 
     for val in roots:
-        if(val > 0 and np.isreal([val]) == [True]):
+        if val > 0 and np.isreal([val]) == [True]:
             t = val
             break
 
     return t
 
-def f_pied(theta, p_theta, rpm):
+def f_pied(theta, ptheta, rpm):
     """
+    calcule la focre exercée sur le pied de la bielle à l'angle moteur theta
     :param theta: angle moteur
-    :param p_theta: pression dans le cylindre en theta
+    :param ptheta: pression dans le cylindre en theta
     :param rpm: vitesse moteur
     :return: force totale appliquée sur le pied de la bielle
     """
-    return (pi*(D**2)/4)*p_theta - mpiston*(C/2)*((6*rpm)**2)*cos(theta)
+    return (pi*(D**2)/4)*ptheta - mpiston*(C/2)*((6*rpm)**2)*cos(theta)
 
 
 
-def f_tete(theta, p_theta, rpm):
+def f_tete(theta, ptheta, rpm):
     """
+    calcule la force exercée sur la tête de la bienne à l'angle moteur theta
     :param theta: angle moteur
-    :param p_theta: pression dans le cylindre en theta
+    :param ptheta: pression dans le cylindre en theta
     :param rpm: vitesse moteur
     :return: force totale appliquée sur la tête de la bielle
     """
-    return -(pi*(D**2)/4)*p_theta + (mpiston+mbielle)*(C/2)*((6*rpm)**2)*cos(theta)
+    return -(pi*(D**2)/4)*ptheta + (mpiston+mbielle)*(C/2)*((6*rpm)**2)*cos(theta)
 
 
 
 def volume(theta):
     """
+    calcule le volume du cylindre à l'angle moteur theta
     :param theta: angle moteur
     :return: volume du cylindre
     """
