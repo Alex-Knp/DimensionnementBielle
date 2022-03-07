@@ -41,7 +41,7 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
         dVdt[t] = dvdt_compute(t)
         dQdt[t] = dqdt_compute(t, thetaC, deltaThetaC)
 
-    p_output = p_theta(s, theta, dVdt, V_output, dQdt)
+    p_output = p_theta(s, theta, dVdt, V_output, dQdt,thetaC)
 
     for t in range(len(theta)):
         F_pied_output[t] = f_pied(t, p_output[t], rpm)
@@ -55,7 +55,7 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
 
-def p_theta(s, theta, dVdt, V_output, dQdt):
+def p_theta(s, theta, dVdt, V_output, dQdt, thetaC):
     # partie la plus dure du devoir -> il faut intégrer numériquement
     """
     calcule la pression dans le cylindre à l'angle moteur theta
@@ -64,6 +64,13 @@ def p_theta(s, theta, dVdt, V_output, dQdt):
     :return: pression dans le clindre
     """
 
+    gamma = 1.3
+    p = [0]*361
+    for angle in theta:
+        if (angle <= thetaC):
+            p[angle + 180]= (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
+
+    rungekutta(360-thetaC, p[thetaC])
 
     return p
 
