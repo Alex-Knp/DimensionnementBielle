@@ -35,7 +35,7 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
         V_output[t] = volume(t)
         Q_output[t] = q_compute(t,thetaC,deltaThetaC)
 
-    p_output[t] = p_theta(s,theta,V_output,Q_output)
+    p_output = p_theta(s,theta,V_output,Q_output)
 
     for t in range(len(theta)):
         F_pied_output[t] = f_pied(t,p_output[t],rpm)
