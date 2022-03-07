@@ -102,7 +102,7 @@ def f_pied(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur le pied de la bielle
     """
-    return (pi * (D ** 2) / 4) * ptheta - mpiston * (C / 2) * ((6 * rpm) ** 2) * cos(deg(theta))
+    return (pi * (D ** 2) / 4) * ptheta - mpiston * (C / 2) * ((6 * rpm) ** 2) * cos(rad(theta))
 
 
 def f_tete(theta, ptheta, rpm):
@@ -113,7 +113,7 @@ def f_tete(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur la tête de la bielle
     """
-    return -(pi * (D ** 2) / 4) * ptheta + (mpiston + mbielle) * (C / 2) * ((6 * rpm) ** 2) * cos(theta)
+    return -(pi * (D ** 2) / 4) * ptheta + (mpiston + mbielle) * (C / 2) * ((6 * rpm) ** 2) * cos(rad(theta))
 
 
 def volume(theta):
@@ -125,13 +125,13 @@ def volume(theta):
     vc = (pi * (D ** 2) / 4) * C
     beta = 2 * L / C
 
-    return (vc / 2) * (1 - cos(theta) + beta - sqrt(beta ** 2 - sin(theta) ** 2)) + vc / (tau - 1)
+    return (vc / 2) * (1 - cos(rad(theta)) + beta - sqrt(beta ** 2 - sin(rad(theta)) ** 2)) + vc / (tau - 1)
 
 
 def q_compute(theta, thetaC, deltaThetaC):
     """/!\ vérifier que Q est bien la variable qu'il faut"""
 
-    return Q * 0.5 * (1 - cos(pi * ((theta - thetaC) / deltaThetaC)))
+    return Q * 0.5 * (1 - cos(rad(pi * ((theta - thetaC) / deltaThetaC))))
 
 
 def dvdt_compute(t):
@@ -143,9 +143,9 @@ def dvdt_compute(t):
 def dqdt_compute(t, thetaC, deltaThetaC):
 
 
-    return (pi*Q)/(2*deltaThetaC)*sin(deg((pi/deltaThetaC)*(t-thetaC)))
+    return (pi*Q)/(2*deltaThetaC)*sin(rad((pi/deltaThetaC)*(t-thetaC)))
 
 
 
-def deg(t):
+def rad(t):
     return 360 * t / (2 * pi)
