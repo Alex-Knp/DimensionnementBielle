@@ -1,6 +1,7 @@
 from math import *
 import numpy as np
 
+"""
 tau = @valeur taux compression@ #[-]
 D = @valeur alesage@ #[m]
 C = @valeur course@ #[m]
@@ -8,6 +9,7 @@ L = @valeur longueur bielle@ #[m]
 mpiston = @valeur masse piston@ #[kg]
 mbielle = @valeur masse bielle@ #[kg]
 Q = @valeur chaleur emise par fuel par kg de melange admis@ #[J/kg_inlet gas]
+"""
 
 
 def myfunc(rpm, s, theta, thetaC, deltaThetaC):
@@ -27,36 +29,44 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     """
     V_output = []
     Q_output = []
+    dVdt = []
+    dQdt = []
     F_pied_output = []
     F_tete_output = []
     p_output = []
 
     for t in range(len(theta)):
         V_output[t] = volume(t)
-        Q_output[t] = q_compute(t,thetaC,deltaThetaC)
+        Q_output[t] = q_compute(t, thetaC, deltaThetaC)
+        dVdt[t] = dvdt_compute(t)
+        dQdt[t] = dqdt_compute(t, thetaC, deltaThetaC)
 
-    p_output = p_theta(s,theta,V_output,Q_output)
+    p_output = p_theta(s, theta, dVdt, V_output, dQdt)
 
     for t in range(len(theta)):
-        F_pied_output[t] = f_pied(t,p_output[t],rpm)
-        F_tete_output[t] = f_tete(t,p_output[t],rpm)
+        F_pied_output[t] = f_pied(t, p_output[t], rpm)
+        F_tete_output[t] = f_tete(t, p_output[t], rpm)
 
-    max_pied = max(max(F_pied_output),abs(min(F_pied_output)))
-    max_tete = max(max(F_tete_output),abs(min(F_tete_output)))
-    peak_force = max(max_tete,max_pied)
+    max_pied = max(max(F_pied_output), abs(min(F_pied_output)))
+    max_tete = max(max(F_tete_output), abs(min(F_tete_output)))
+    peak_force = max(max_tete, max_pied)
     t = t_compute(peak_force)
 
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
-def p_theta(s,theta,v_output,q_output):
-    #partie la plus dure du devoir -> il faut intégrer numériquement
+
+def p_theta(s, theta, dVdt, V_output, dQdt):
+    # partie la plus dure du devoir -> il faut intégrer numériquement
     """
     calcule la pression dans le cylindre à l'angle moteur theta
+    :param theta: angle moteur
     :param s: taux de suralimentation
     :return: pression dans le clindre
     """
 
+
     return p
+
 
 def t_compute(peak_force):
     """
@@ -67,14 +77,14 @@ def t_compute(peak_force):
     :rtype: int
     :return: dimension t de la section en I
     """
-    #il faut résoudre un 4e degré de la forme a*t^4 + b*t^2 + c = 0
+    # il faut résoudre un 4e degré de la forme a*t^4 + b*t^2 + c = 0
     t = None
 
-    a = -1/peak_force
-    b = 1/(495*10**7)
-    c = ((L**2)*6)/((pi**2)*131*(10**11))
+    a = -1 / peak_force
+    b = 1 / (495 * 10 ** 7)
+    c = ((L ** 2) * 6) / ((pi ** 2) * 131 * (10 ** 11))
 
-    roots = np.roots([a,0,b,0,c])
+    roots = np.roots([a, 0, b, 0, c])
 
     for val in roots:
         if val > 0 and np.isreal([val]) == [True]:
@@ -82,6 +92,7 @@ def t_compute(peak_force):
             break
 
     return t
+
 
 def f_pied(theta, ptheta, rpm):
     """
@@ -91,8 +102,7 @@ def f_pied(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur le pied de la bielle
     """
-    return (pi*(D**2)/4)*ptheta - mpiston*(C/2)*((6*rpm)**2)*cos(deg(theta))
-
+    return (pi * (D ** 2) / 4) * ptheta - mpiston * (C / 2) * ((6 * rpm) ** 2) * cos(deg(theta))
 
 
 def f_tete(theta, ptheta, rpm):
@@ -103,8 +113,7 @@ def f_tete(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur la tête de la bielle
     """
-    return -(pi*(D**2)/4)*ptheta + (mpiston+mbielle)*(C/2)*((6*rpm)**2)*cos(theta)
-
+    return -(pi * (D ** 2) / 4) * ptheta + (mpiston + mbielle) * (C / 2) * ((6 * rpm) ** 2) * cos(theta)
 
 
 def volume(theta):
@@ -113,15 +122,30 @@ def volume(theta):
     :param theta: angle moteur
     :return: volume du cylindre
     """
-    vc = (pi*(D**2)/4)*C
-    beta = 2*L/C
+    vc = (pi * (D ** 2) / 4) * C
+    beta = 2 * L / C
 
-    return (vc/2)*(1-cos(theta)+beta-sqrt(beta**2-sin(theta)**2))+vc/(tau-1)
+    return (vc / 2) * (1 - cos(theta) + beta - sqrt(beta ** 2 - sin(theta) ** 2)) + vc / (tau - 1)
 
-def q_compute(theta , thetaC, deltaThetaC):
+
+def q_compute(theta, thetaC, deltaThetaC):
     """/!\ vérifier que Q est bien la variable qu'il faut"""
 
-    return Q*0.5*(1-cos(pi*((theta-thetaC)/deltaThetaC)))
+    return Q * 0.5 * (1 - cos(pi * ((theta - thetaC) / deltaThetaC)))
+
+
+def dvdt_compute(t):
+
+
+    return dvdt
+
+
+def dqdt_compute(t, thetaC, deltaThetaC):
+
+
+    return (pi*Q)/(2*deltaThetaC)*sin(deg((pi/deltaThetaC)*(t-thetaC)))
+
+
 
 def deg(t):
-    return 360*t/(2*pi)
+    return 360 * t / (2 * pi)
