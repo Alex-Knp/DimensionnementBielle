@@ -34,7 +34,10 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     for t in range(len(theta)):
         V_output[t] = volume(t)
         Q_output[t] = q_compute(t,thetaC,deltaThetaC)
-        p_output[t] = p_theta(rpm,s,theta,thetaC,deltaThetaC)
+
+    p_output[t] = p_theta(s,theta,V_output,Q_output)
+
+    for t in range(len(theta)):
         F_pied_output[t] = f_pied(t,p_output[t],rpm)
         F_tete_output[t] = f_tete(t,p_output[t],rpm)
 
@@ -45,15 +48,11 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
 
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
-def p_theta(rpm, s, theta, thetaC, deltaThetaC):
+def p_theta(s,theta,v_output,q_output):
     #partie la plus dure du devoir -> il faut intégrer numériquement
     """
     calcule la pression dans le cylindre à l'angle moteur theta
-    :param rpm: vitesse moteur
     :param s: taux de suralimentation
-    :param theta: angle moteur
-    :param thetaC: angle moteur d'allumage
-    :param deltaThetaC: durée de combustion
     :return: pression dans le clindre
     """
 
@@ -92,7 +91,7 @@ def f_pied(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur le pied de la bielle
     """
-    return (pi*(D**2)/4)*ptheta - mpiston*(C/2)*((6*rpm)**2)*cos(theta)
+    return (pi*(D**2)/4)*ptheta - mpiston*(C/2)*((6*rpm)**2)*cos(deg(theta))
 
 
 
@@ -123,3 +122,6 @@ def q_compute(theta , thetaC, deltaThetaC):
     """/!\ vérifier que Q est bien la variable qu'il faut"""
 
     return Q*0.5*(1-cos(pi*((theta-thetaC)/deltaThetaC)))
+
+def deg(t):
+    return 360*t/(2*pi)
