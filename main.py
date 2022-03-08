@@ -159,16 +159,17 @@ def dqdt_compute(t, thetaC, deltaThetaC):
     return (pi*Q)/(2*deltaThetaC)*sin(rad((pi/deltaThetaC)*(t-thetaC)))
 
 
-
 def rad(t):
     return 360 * t / (2 * pi)
+
 
 def fun(p, theta, thetaC, deltaThetaC):
     return(-1.3*p/volume(theta)*dvdt_compute(theta) + 0.3*dqdt_compute(theta, thetaC, deltaThetaC)/volume(theta))
 
+
 def rungekutta(p, thetaC, deltaThetaC):
 
-    for i in range(thetaC, thetaC + deltaThetaC):
+    for i in range(180-thetaC, 180-thetaC + deltaThetaC):
         k1 = fun(p[i], i, thetaC, deltaThetaC)
         k2 = fun(p[i] + K1 /2, i + 1/2,thetaC, deltaThetaC)
         k3 = fun(p[i] + K2 /2, i + 1/2,thetaC, deltaThetaC)
