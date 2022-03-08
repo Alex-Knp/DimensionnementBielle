@@ -55,7 +55,7 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
 
-def p_theta(s, theta, dVdt, V_output, dQdt, thetaC):
+def p_theta(s, theta, dVdt, V_output, dQdt,deltaThetaC, thetaC):
     # partie la plus dure du devoir -> il faut intégrer numériquement
     """
     calcule la pression dans le cylindre à l'angle moteur theta
@@ -67,12 +67,15 @@ def p_theta(s, theta, dVdt, V_output, dQdt, thetaC):
     gamma = 1.3
     p = [0]*361
     for angle in theta:
-        if (angle <= thetaC):
+        if (angle <= 180-thetaC):
             p[angle + 180]= (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
 
     rungekutta(p, thetaC, deltaThetaC)
 
-    #p apres deltathetaC alex le caca caca
+
+    for angle in theta[180-thetaC+deltaThetaC:] :
+        p[angle+180] = (p[180-thetaC+deltaThetaC] * ((volume(180-thetaC+deltaThetaC) / volume(angle)) ** gamma))
+
 
     return p
 
