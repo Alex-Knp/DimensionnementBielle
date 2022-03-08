@@ -70,7 +70,7 @@ def p_theta(s, theta, dVdt, V_output, dQdt, thetaC):
         if (angle <= thetaC):
             p[angle + 180]= (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
 
-    rungekutta(p, p[thetaC], thetaC, deltaThetaC)
+    rungekutta(p, thetaC, deltaThetaC)
 
     #p apres deltathetaC alex le caca caca
 
@@ -163,7 +163,7 @@ def rad(t):
 def fun(p, theta, thetaC, deltaThetaC):
     return(-1.3*p/volume(theta)*dvdt_compute(theta) + 0.3*dqdt_compute(theta, thetaC, deltaThetaC)/volume(theta))
 
-def rungekutta(p, p_0, thetaC, deltaThetaC):
+def rungekutta(p, thetaC, deltaThetaC):
 
     for i in range(thetaC, thetaC + deltaThetaC):
         k1 = fun(p[i], i, thetaC, deltaThetaC)
