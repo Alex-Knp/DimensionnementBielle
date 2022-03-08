@@ -2,14 +2,16 @@ from math import *
 import numpy as np
 from matplotlib import pyplot as plt
 
-# moteur Opel Corsa C 1.3 CDTI (70 Hp)
-tau = 18  # [-]
-D = 0.0696  # [m]
-C = 0.0854  # [m]
-L = 0.0969  # [m]
-mpiston = 0.600  # [kg] APPROXIMER
-mbielle = 0.450  # [kg]
-Q = 1650000  # [J/kg_inlet gas]
+
+#moteur Opel Corsa C 1.3 CDTI (70 Hp)
+tau = 18 #[-]
+D = 0.0696 #[m]
+C = 0.0854 #[m]
+L = 0.0969 #[m]
+mpiston = 0.600#[kg] APPROXIMER
+mbielle = 0.450 #[kg]
+Q = 1650000 #[J/kg_inlet gas]
+
 
 
 def myfunc(rpm, s, theta, thetaC, deltaThetaC):
@@ -27,21 +29,21 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     :type deltaThetaC: int
     :return:
     """
-    V_output = [0] * 361
-    Q_output = [0] * 361
-    F_pied_output = [0] * 361
-    F_tete_output = [0] * 361
-    p_output = [0] * 361
+    V_output = [0]*361
+    Q_output = [0]*361
+    F_pied_output = [0]*361
+    F_tete_output = [0]*361
+    p_output = [0]*361
 
     for t in range(len(theta)):
-        V_output[t] = volume(t - 180)
-        Q_output[t] = q_compute(t - 180, thetaC, deltaThetaC)
+        V_output[t] = volume(t-180)
+        Q_output[t] = q_compute(t-180, thetaC, deltaThetaC)
 
-    p_output = p_theta(s, theta, deltaThetaC, thetaC)
+    p_output = p_theta(s, theta,deltaThetaC,thetaC)
 
     for t in range(len(theta)):
-        F_pied_output[t] = f_pied(t - 180, p_output[t], rpm)
-        F_tete_output[t] = f_tete(t - 180, p_output[t], rpm)
+        F_pied_output[t] = f_pied(t-180, p_output[t], rpm)
+        F_tete_output[t] = f_tete(t-180, p_output[t], rpm)
 
     max_pied = max(max(F_pied_output), abs(min(F_pied_output)))
     max_tete = max(max(F_tete_output), abs(min(F_tete_output)))
@@ -51,7 +53,7 @@ def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     return (V_output, Q_output, F_pied_output, F_tete_output, p_output, t)
 
 
-def p_theta(s, theta, deltaThetaC, thetaC):
+def p_theta(s, theta,deltaThetaC, thetaC):
     # partie la plus dure du devoir -> il faut intégrer numériquement
     """
     calcule la pression dans le cylindre à l'angle moteur theta
@@ -61,16 +63,17 @@ def p_theta(s, theta, deltaThetaC, thetaC):
     """
 
     gamma = 1.3
-    p = [0] * 361
+    p = [0]*361
     for angle in theta:
-        if (angle <= 180 - thetaC):
-            p[angle + 180] = (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
+        if (angle <= 180-thetaC):
+            p[angle + 180]= (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
 
     rungekutta(p, thetaC, deltaThetaC)
 
-    for angle in theta[180 - thetaC + deltaThetaC:]:
-        p[angle + 180] = (
-                    p[180 - thetaC + deltaThetaC] * ((volume(180 - thetaC + deltaThetaC) / volume(angle)) ** gamma))
+
+    for angle in theta[180-thetaC+deltaThetaC:] :
+        p[angle+180] = (p[180-thetaC+deltaThetaC] * ((volume(180-thetaC+deltaThetaC) / volume(angle)) ** gamma))
+
 
     return p
 
@@ -140,39 +143,39 @@ def volume(theta):
 def q_compute(theta, thetaC, deltaThetaC):
     """/!\ vérifier que Q est bien la variable qu'il faut"""
 
-    if (theta < -thetaC): return 0
+    if(theta<-thetaC or theta >-thetaC+deltaThetaC): return 0
 
-    if (theta > -thetaC + deltaThetaC): return 0
 
-    return Q * (10 ** -5) * 0.5 * (1 - cos(rad(360 * ((theta + thetaC) / deltaThetaC))))
+    return Q* 0.5 * (1 - cos(pi * (rad((theta + thetaC)) / rad(deltaThetaC))))
 
 
 def dvdt_compute(t):
     vc = (pi * (D ** 2) / 4) * C
     beta = 2 * L / C
 
-    return (vc / 2) * (sin(rad(t)) + (sin(rad(t)) * cos(t)) / (sqrt(beta ** 2 - (sin(rad(t))) ** 2)))
+    return (vc/2)*(sin(rad(t))+(sin(rad(t))*cos(t))/(sqrt(beta**2-(sin(rad(t)))**2)))
 
 
 def dqdt_compute(t, thetaC, deltaThetaC):
-    if (t < -thetaC or t > -thetaC + deltaThetaC): return 0
 
-    return (360 * Q) / (2 * deltaThetaC) * sin(rad((360 / deltaThetaC) * (t - thetaC)))
+    if(t<-thetaC or t >-thetaC+deltaThetaC): return 0
+
+    return (pi*Q)/(2*rad(deltaThetaC))*sin((pi/rad(deltaThetaC))*rad((t+thetaC)))
 
 
 def rad(t):
-    return 2 * pi * t / 360
+    return 2 * pi *t /360
 
 
 def fun(p, theta, thetaC, deltaThetaC):
-    return (-1.3 * p / volume(theta) * dvdt_compute(theta) + 0.3 * dqdt_compute(theta, thetaC, deltaThetaC) / volume(
-        theta))
+    return(-1.3*p/volume(theta)*dvdt_compute(theta) + 0.3*dqdt_compute(theta, thetaC, deltaThetaC)/volume(theta))
 
 
 def rungekutta(p, thetaC, deltaThetaC):
-    for i in range(180 - thetaC, 180 - thetaC + deltaThetaC):
+
+    for i in range(180-thetaC, 180-thetaC + deltaThetaC):
         K1 = fun(p[i], i, thetaC, deltaThetaC)
-        K2 = fun(p[i] + K1 / 2, i + 1 / 2, thetaC, deltaThetaC)
-        K3 = fun(p[i] + K2 / 2, i + 1 / 2, thetaC, deltaThetaC)
-        K4 = fun(p[i] + K3, i + 1, thetaC, deltaThetaC)
-        p[i + 1] = p[i] + (K1 + 2 * K2 + 2 * K3 + K4) / 6
+        K2 = fun(p[i] + K1 /2, i + 1/2,thetaC, deltaThetaC)
+        K3 = fun(p[i] + K2 /2, i + 1/2,thetaC, deltaThetaC)
+        K4 = fun(p[i] + K3, i + 1,thetaC, deltaThetaC)
+        p[i+1] = p[i] + (K1 + 2*K2 + 2*K3 + K4)/6
