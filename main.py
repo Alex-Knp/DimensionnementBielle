@@ -72,7 +72,7 @@ def p_theta(s, theta, dVdt, V_output, dQdt, thetaC):
 
     rungekutta(p, p[thetaC], thetaC, deltaThetaC)
 
-    #p apres deltathetaC alex le caca
+    #p apres deltathetaC alex le caca caca
 
     return p
 
