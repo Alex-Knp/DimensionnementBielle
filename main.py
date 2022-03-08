@@ -14,7 +14,7 @@ Q = @valeur chaleur emise par fuel par kg de melange admis@ #[J/kg_inlet gas]
 
 def myfunc(rpm, s, theta, thetaC, deltaThetaC):
     """
-
+    fonction main
     :param rpm: vitesse moteur
     :type rpm: int
     :param s: pression turbo
