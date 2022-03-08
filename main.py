@@ -1,15 +1,15 @@
 from math import *
 import numpy as np
 
-"""
-tau = @valeur taux compression@ #[-]
-D = @valeur alesage@ #[m]
-C = @valeur course@ #[m]
-L = @valeur longueur bielle@ #[m]
-mpiston = @valeur masse piston@ #[kg]
-mbielle = @valeur masse bielle@ #[kg]
-Q = @valeur chaleur emise par fuel par kg de melange admis@ #[J/kg_inlet gas]
-"""
+#moteur Opel Corsa C 1.3 CDTI (70 Hp)
+tau = 18 #[-]
+D = 0.0696 #[m]
+C = 0.0854 #[m]
+L = 0.0969 #[m]
+mpiston = 0.600#[kg] APPROXIMER
+mbielle = 0.450 #[kg]
+Q = 1650000 #[J/kg_inlet gas]
+
 
 
 def myfunc(rpm, s, theta, thetaC, deltaThetaC):
@@ -157,3 +157,14 @@ def dqdt_compute(t, thetaC, deltaThetaC):
 
 def rad(t):
     return 360 * t / (2 * pi)
+
+def fun(p, theta, thetaC, deltaThetaC):
+    return(-1.3*p/volume(theta)*dvdt_compute(theta) + 0.3*dqdt_compute(theta, thetaC, deltaThetaC)/volume(theta))
+
+def rungekutta(p, p_0, thetaC, deltaThetaC):
+
+    for i in range(thetaC, len(p)):
+        k1 = fun(p[i], i, thetaC, deltaThetaC)
+
+
+
