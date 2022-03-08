@@ -70,7 +70,9 @@ def p_theta(s, theta, dVdt, V_output, dQdt, thetaC):
         if (angle <= thetaC):
             p[angle + 180]= (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
 
-    rungekutta(360-thetaC, p[thetaC])
+    rungekutta(p, p[thetaC], thetaC, deltaThetaC)
+
+    #p apres deltathetaC alex le caca
 
     return p
 
@@ -89,7 +91,7 @@ def t_compute(peak_force):
 
     a = -1 / peak_force
     b = 1 / (495 * 10 ** 7)
-    c = ((L ** 2) * 6) / ((pi ** 2) * 131 * (10 ** 11))
+    c = ((L * 2) * 6) / ((pi * 2) * 131 * (10 ** 11))
 
     roots = np.roots([a, 0, b, 0, c])
 
@@ -109,7 +111,7 @@ def f_pied(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur le pied de la bielle
     """
-    return (pi * (D ** 2) / 4) * ptheta - mpiston * (C / 2) * ((6 * rpm) ** 2) * cos(rad(theta))
+    return (pi * (D * 2) / 4) * ptheta - mpiston * (C / 2) * ((6 * rpm) * 2) * cos(rad(theta))
 
 
 def f_tete(theta, ptheta, rpm):
@@ -120,7 +122,7 @@ def f_tete(theta, ptheta, rpm):
     :param rpm: vitesse moteur
     :return: force totale appliquée sur la tête de la bielle
     """
-    return -(pi * (D ** 2) / 4) * ptheta + (mpiston + mbielle) * (C / 2) * ((6 * rpm) ** 2) * cos(rad(theta))
+    return -(pi * (D * 2) / 4) * ptheta + (mpiston + mbielle) * (C / 2) * ((6 * rpm) * 2) * cos(rad(theta))
 
 
 def volume(theta):
@@ -132,7 +134,7 @@ def volume(theta):
     vc = (pi * (D ** 2) / 4) * C
     beta = 2 * L / C
 
-    return (vc / 2) * (1 - cos(rad(theta)) + beta - sqrt(beta ** 2 - sin(rad(theta)) ** 2)) + vc / (tau - 1)
+    return (vc / 2) * (1 - cos(rad(theta)) + beta - sqrt(beta * 2 - sin(rad(theta)) * 2)) + vc / (tau - 1)
 
 
 def q_compute(theta, thetaC, deltaThetaC):
@@ -163,8 +165,9 @@ def fun(p, theta, thetaC, deltaThetaC):
 
 def rungekutta(p, p_0, thetaC, deltaThetaC):
 
-    for i in range(thetaC, len(p)):
+    for i in range(thetaC, thetaC + deltaThetaC):
         k1 = fun(p[i], i, thetaC, deltaThetaC)
-
-
-
+        k2 = fun(p[i] + K1 /2, i + 1/2,thetaC, deltaThetaC)
+        k3 = fun(p[i] + K2 /2, i + 1/2,thetaC, deltaThetaC)
+        k4 = fun(p[i] + K3 , i + 1,thetaC, deltaThetaC)
+        p[i+1] = p[i] + (k1 + 2*K2 + 2*K3 + K4)/6
