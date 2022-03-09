@@ -60,7 +60,7 @@ def p_theta(s, theta, deltaThetaC, thetaC):
     :return: pression dans le clindre
     """
 
-    p = rungekutta(s,theta, thetaC,deltaThetaC)
+    p = euler_expl(s,theta, thetaC,deltaThetaC)
 
     return p
 
