@@ -170,3 +170,15 @@ def rungekutta(r,theta, thetaC, deltaThetaC):
 
     return p
 
+def euler_expl(r, theta, thetaC, deltaThetaC):
+    p = [0] * len(theta)
+
+    p[0] = r
+
+    for i in range(len(theta)-1):
+        p[i+1] = p[i] + fun(p[i] , i, thetaC, deltaThetaC)
+
+
+
+
+
