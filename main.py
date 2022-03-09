@@ -60,25 +60,7 @@ def p_theta(s, theta, deltaThetaC, thetaC):
     :return: pression dans le clindre
     """
 
-    gamma = 1.3
-    p = [0] * 361
-    for angle in theta:
-        if (angle <= 180 - thetaC):
-            p[angle + 180] = (s * 100000 * ((volume(-180) / volume(angle)) ** gamma))
-
-    y = rungekutta(p[180 - thetaC], thetaC, deltaThetaC)
-
-    plt.figure(figsize=(6, 3))
-
-    plt.plot(theta[181 - thetaC:181 - thetaC + deltaThetaC], y)
-
-    plt.show()
-
-    p[181 - thetaC:181 - thetaC + deltaThetaC] = rungekutta(p[180 - thetaC], thetaC, deltaThetaC)
-
-    for angle in theta[180 - thetaC + deltaThetaC:]:
-        p[angle + 180] = (
-                    p[180 - thetaC + deltaThetaC] * ((volume(180 - thetaC + deltaThetaC) / volume(angle)) ** gamma))
+    p = rungekutta(s,theta, thetaC,deltaThetaC)
 
     return p
 
@@ -100,12 +82,11 @@ def t_compute(peak_force):
     c = ((L * 2) * 6) / ((pi * 2) * 131 * (10 ** 11))
 
     roots = np.roots([a, 0, b, 0, c])
+    print(roots)
 
     for val in roots:
         if val > 0 and np.isreal([val]) == [True]:
-            arr = np.array([val])
-            arr.real
-            t = int(arr[0])
+            t = np.real(val)
             break
 
     return t
@@ -150,7 +131,7 @@ def q_compute(theta, thetaC, deltaThetaC):
 
     if (theta < -thetaC or theta > -thetaC + deltaThetaC): return 0
 
-    return Q * 0.5 * (1 - cos(pi * (rad((theta + thetaC)) / rad(deltaThetaC))))
+    return Q * 10 ** -5 * 0.5 * (1 - cos(pi * (rad((theta + thetaC)) / rad(deltaThetaC))))
 
 
 def dvdt_compute(t):
@@ -175,17 +156,17 @@ def fun(p, theta, thetaC, deltaThetaC):
         theta))
 
 
-def rungekutta(r, thetaC, deltaThetaC):
-    p = [0] * deltaThetaC
+def rungekutta(r,theta, thetaC, deltaThetaC):
+    p = [0] * len(theta)
 
     p[0] = r
 
-    for i in range(deltaThetaC - 1):
-        print(i)
-        K1 = fun(p[i], i, thetaC, deltaThetaC)
-        K2 = fun(p[i] + K1 / 2, i + 1 / 2, thetaC, deltaThetaC)
-        K3 = fun(p[i] + K2 / 2, i + 1 / 2, thetaC, deltaThetaC)
-        K4 = fun(p[i] + K3, i + 1, thetaC, deltaThetaC)
+    for i in range(len(theta)-1):
+        K1 = fun(p[i], theta[i], thetaC, deltaThetaC)
+        K2 = fun(p[i] + K1 / 2, theta[i] + 1 / 2, thetaC, deltaThetaC)
+        K3 = fun(p[i] + K2 / 2, theta[i] + 1 / 2, thetaC, deltaThetaC)
+        K4 = fun(p[i] + K3, theta[i] + 1, thetaC, deltaThetaC)
         p[i + 1] = p[i] + (K1 + 2 * K2 + 2 * K3 + K4) / 6
 
     return p
+
