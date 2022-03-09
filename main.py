@@ -157,7 +157,7 @@ def dvdt_compute(t):
     vc = (pi * (D ** 2) / 4) * C
     beta = 2 * L / C
 
-    return (vc / 2) * (sin(rad(t)) + (sin(rad(t)) * cos(t)) / (sqrt(beta ** 2 - (sin(rad(t))) ** 2)))
+    return (vc / 2) * (sin(rad(t)) + (sin(rad(t)) * cos(rad(t))) / (sqrt(beta ** 2 - (sin(rad(t))) ** 2)))
 
 
 def dqdt_compute(t, thetaC, deltaThetaC):
