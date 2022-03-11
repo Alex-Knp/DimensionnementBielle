@@ -60,7 +60,7 @@ def p_theta(s, theta, deltaThetaC, thetaC):
     :return: pression dans le clindre
     """
 
-    p = euler_expl(s,theta, thetaC,deltaThetaC)
+    p = euler_expl(s, theta, thetaC, deltaThetaC)
 
     return p
 
@@ -128,8 +128,10 @@ def volume(theta):
 
 def q_compute(theta, thetaC, deltaThetaC):
     """/!\ vérifier que Q est bien la variable qu'il faut"""
+    if (theta < -thetaC): return 0
 
-    if (theta < -thetaC or theta > -thetaC + deltaThetaC): return 0
+    if (theta > -thetaC + deltaThetaC): return Q * 10 ** -5 * 0.5 * (
+                1 - cos(pi * (rad((deltaThetaC)) / rad(deltaThetaC))))
 
     return Q * 10 ** -5 * 0.5 * (1 - cos(pi * (rad((theta + thetaC)) / rad(deltaThetaC))))
 
@@ -144,7 +146,7 @@ def dvdt_compute(t):
 def dqdt_compute(t, thetaC, deltaThetaC):
     if (t < -thetaC or t > -thetaC + deltaThetaC): return 0
 
-    return (pi * Q * 10 ** -5) / (2 * rad(deltaThetaC)) * sin((pi / rad(deltaThetaC)) * rad((t + thetaC)))
+    return (pi * Q * 10 ** -2) / (2 * rad(deltaThetaC)) * sin((pi / rad(deltaThetaC)) * rad((t + thetaC)))
 
 
 def rad(t):
@@ -156,12 +158,12 @@ def fun(p, theta, thetaC, deltaThetaC):
         theta))
 
 
-def rungekutta(r,theta, thetaC, deltaThetaC):
+def rungekutta(r, theta, thetaC, deltaThetaC):
     p = [0] * len(theta)
 
     p[0] = r
 
-    for i in range(len(theta)-1):
+    for i in range(len(theta) - 1):
         K1 = fun(p[i], theta[i], thetaC, deltaThetaC)
         K2 = fun(p[i] + K1 / 2, theta[i] + 1 / 2, thetaC, deltaThetaC)
         K3 = fun(p[i] + K2 / 2, theta[i] + 1 / 2, thetaC, deltaThetaC)
@@ -170,14 +172,46 @@ def rungekutta(r,theta, thetaC, deltaThetaC):
 
     return p
 
+
 def euler_expl(r, theta, thetaC, deltaThetaC):
     p = [0] * len(theta)
 
     p[0] = r
 
-    for i in range(len(theta)-1):
-        p[i+1] = p[i] + fun(p[i] , i, thetaC, deltaThetaC)
+    for i in range(len(theta) - 1):
+        p[i + 1] = p[i] + fun(p[i], theta[i], thetaC, deltaThetaC)
 
+    return p
+
+
+theta = [0] * 361
+for i in range(361):
+    theta[i] = i - 180
+
+V, q, Fp, Ft, p, t = myfunc(3000, 1, theta, 5, 60)
+
+dqdt = [0] * 361
+dvdt = [0] * 361
+dr = [0] * 361
+ds = [0] * 361
+
+for i in theta:
+    dqdt[i - 180] = dqdt_compute(i, 5, 60)
+    dvdt[i - 180] = dvdt_compute(i)
+    dr[i - 180] = 0.3 * dqdt_compute(i, 5, 60) / volume(i) + (100000 * ((volume(-180) / volume(i) ** 1.3)))
+    ds[i - 180] = (100000 * ((volume(-180) / volume(i) ** 1.3)))
+
+plt.figure(figsize=(6, 3))
+
+plt.plot(theta, p)
+plt.axvline(x=-5, linestyle='-.', color='red', label="Début explosion", linewidth=0.5)
+plt.axvline(x=80, linestyle='-.', color='green', label="Fin explosion", linewidth=0.5)
+
+plt.show()
+
+print("Q = ", q)
+print("p = ", p)
+print("t = ", t)
 
 
 
