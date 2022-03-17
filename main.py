@@ -60,7 +60,7 @@ def p_theta(s, theta, deltaThetaC, thetaC):
     :return: pression dans le clindre
     """
 
-    p = euler_expl(s, theta, thetaC, deltaThetaC)
+    p = rungekutta(s*100000, theta, thetaC, deltaThetaC)
 
     return p
 
@@ -131,7 +131,7 @@ def q_compute(theta, thetaC, deltaThetaC):
     if (theta < -thetaC): return 0
 
     if (theta > -thetaC + deltaThetaC): return Q * 10 ** -5 * 0.5 * (
-                1 - cos(pi * (rad((deltaThetaC)) / rad(deltaThetaC))))
+            1 - cos(pi * (rad((deltaThetaC)) / rad(deltaThetaC))))
 
     return Q * 10 ** -5 * 0.5 * (1 - cos(pi * (rad((theta + thetaC)) / rad(deltaThetaC))))
 
@@ -158,32 +158,31 @@ def fun(p, theta, thetaC, deltaThetaC):
         theta))
 
 
-def rungekutta(r, theta, thetaC, deltaThetaC):
-    p = [0] * len(theta)
+def rungekutta(p0, t, thetaC, deltaThetaC):
+    P = [0] * len(t)
+    P[0] = p0
 
-    p[0] = r
+    for j in range(len(t) - 1):
+        K1 = fun(P[j], t[j], thetaC, deltaThetaC)
+        K2 = fun(P[j] + K1 / 2, t[j] + 1 / 2, thetaC, deltaThetaC)
+        K3 = fun(P[j] + K2 / 2, t[j] + 1 / 2, thetaC, deltaThetaC)
+        K4 = fun(P[j] + K3, t[j] + 1, thetaC, deltaThetaC)
+        P[j + 1] = P[j] + (K1 + 2 * K2 + 2 * K3 + K4) / 6
 
-    for i in range(len(theta) - 1):
-        K1 = fun(p[i], theta[i], thetaC, deltaThetaC)
-        K2 = fun(p[i] + K1 / 2, theta[i] + 1 / 2, thetaC, deltaThetaC)
-        K3 = fun(p[i] + K2 / 2, theta[i] + 1 / 2, thetaC, deltaThetaC)
-        K4 = fun(p[i] + K3, theta[i] + 1, thetaC, deltaThetaC)
-        p[i + 1] = p[i] + (K1 + 2 * K2 + 2 * K3 + K4) / 6
-
-    return p
+    return P
 
 
 def euler_expl(r, theta, thetaC, deltaThetaC):
-    p = [0] * len(theta)
+    P = [0] * len(theta)
 
-    p[0] = r
+    P[0] = r
 
-    for i in range(len(theta) - 1):
-        p[i + 1] = p[i] + fun(p[i], theta[i], thetaC, deltaThetaC)
+    for k in range(len(theta) - 1):
+        P[k + 1] = P[k] + fun(P[k], theta[k], thetaC, deltaThetaC)
 
-    return p
+    return P
 
-
+#Tests
 theta = [0] * 361
 for i in range(361):
     theta[i] = i - 180
@@ -212,7 +211,3 @@ plt.show()
 print("Q = ", q)
 print("p = ", p)
 print("t = ", t)
-
-
-
-
